@@ -8,6 +8,12 @@ app.use(express.json());
 
 app.use("/api/users", usersRoutes);
 
+app.use((error, req, res, next) => {
+  const message = error.message || "Server error";
+  const statusCode = error.code || 500;
+  res.status(statusCode).json({ message: message });
+});
+
 mongoose
   .connect(
     `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.49kwkjl.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`
