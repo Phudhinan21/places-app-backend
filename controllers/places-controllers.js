@@ -2,7 +2,21 @@ const Place = require("../models/place");
 const User = require("../models/user");
 
 exports.getPlaceById = async (req, res, next) => {
-  res.status(200).json({ message: "place" });
+  const { placeId } = req.params;
+
+  try {
+    const place = await Place.findById(placeId);
+
+    if (!place) {
+      const error = new Error("There is no place.");
+      error.code = 422;
+      throw error;
+    }
+
+    res.status(200).json({ place: place });
+  } catch (error) {
+    return next(error);
+  }
 };
 
 exports.createPlace = async (req, res, next) => {
