@@ -42,10 +42,42 @@ exports.signup = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
-    res
-      .status(200)
-      .json({ message: "users routes", user: newUser, token: token });
+    res.status(200).json({ message: "Signup successfully", token: token });
   } catch (error) {
     return next(error);
+  }
+};
+
+exports.login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      const error = new Error("This user is not exist, please try again.");
+      error.code = 401;
+      throw error;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      const error = new Error("The password is not correct, please try again.");
+      error.code = 401;
+      throw error;
+    }
+
+    const token = jwt.sign(
+      { user: { userId: user._id } },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.status(200).json({ message: "Login successfully", token: token });
+  } catch (error) {
+    next(error);
   }
 };
