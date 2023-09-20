@@ -3,10 +3,12 @@ const mongoose = require("mongoose");
 const app = express();
 
 const usersRoutes = require("./routes/api/users-routes");
+const placeRoutes = require("./routes/api/places-routes");
 
 app.use(express.json());
 
 app.use("/api/users", usersRoutes);
+app.use("/api/places", placeRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Could not found");
