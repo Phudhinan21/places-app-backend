@@ -17,8 +17,6 @@ exports.getUser = async (req, res, next) => {
 };
 
 exports.signup = async (req, res, next) => {
-  const { name, email, password } = req.body;
-
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -29,6 +27,8 @@ exports.signup = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+
+  const { name, email, password } = req.body;
 
   try {
     const user = await User.findOne({ email: email });
