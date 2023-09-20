@@ -4,6 +4,18 @@ const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 
+exports.getUser = async (req, res, next) => {
+  try {
+    const users = await User.find().select("-password");
+
+    res.status(200).json({ users: users });
+  } catch (err) {
+    const error = new Error("Fetched users is failed, please try again.");
+    err.code = 500;
+    return next(error);
+  }
+};
+
 exports.signup = async (req, res, next) => {
   const { name, email, password } = req.body;
 
