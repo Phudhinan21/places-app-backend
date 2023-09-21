@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const app = express();
 
 const usersRoutes = require("./routes/api/users-routes");
 const placeRoutes = require("./routes/api/places-routes");
 
-app.use(express.json());
+app.use(bodyParser.json());
 
 app.use("/api/users", usersRoutes);
 app.use("/api/places", placeRoutes);
