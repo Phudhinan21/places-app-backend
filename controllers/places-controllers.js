@@ -20,6 +20,26 @@ exports.getPlaceById = async (req, res, next) => {
   }
 };
 
+exports.getPlaceByUserId = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error("There is no user.");
+      error.code = 400;
+      throw error;
+    }
+
+    const places = await Place.find({ creator: userId });
+
+    res.status(200).json({ places: places });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 exports.createPlace = async (req, res, next) => {
   try {
     const errors = validationResult(req);

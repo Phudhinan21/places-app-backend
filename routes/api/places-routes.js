@@ -7,6 +7,8 @@ const auth = require("../../middleware/auth");
 
 router.get("/:placeId", placesControllers.getPlaceById);
 
+router.get("/user/:userId", placesControllers.getPlaceByUserId);
+
 router.post(
   "/create-place",
   auth,
