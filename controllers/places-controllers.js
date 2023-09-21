@@ -59,7 +59,7 @@ exports.createPlace = async (req, res, next) => {
 
     if (!user) {
       const error = new Error("There is no user.");
-      error.code = 422;
+      error.code = 401;
       throw error;
     }
 
@@ -79,6 +79,94 @@ exports.createPlace = async (req, res, next) => {
       place: newPlace,
       user: user,
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.updatePlace = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const error = new Error("Invalid input");
+      error.code = 422;
+      throw error;
+    }
+  } catch (error) {
+    return next(error);
+  }
+
+  const { placeId } = req.params;
+  const { title, description } = req.body;
+
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      const error = new Error("There is no user.");
+      error.code = 401;
+      throw error;
+    }
+
+    const place = await Place.findById(placeId);
+
+    if (!place) {
+      const error = new Error("There is no place.");
+      error.code = 422;
+      throw error;
+    }
+
+    if (req.userId !== place.creator.toString()) {
+      const error = new Error("You are not allowed to delete this place.");
+      error.code = 401;
+      throw error;
+    }
+
+    place.title = title;
+    place.description = description;
+
+    await place.save();
+
+    res
+      .status(200)
+      .json({ message: "Updated place successfully", place: place });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.deletePlace = async (req, res, next) => {
+  const { placeId } = req.params;
+
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      const error = new Error("There is no user.");
+      error.code = 401;
+      throw error;
+    }
+
+    const place = await Place.findById(placeId);
+
+    if (!place) {
+      const error = new Error("There is no place.");
+      error.code = 422;
+      throw error;
+    }
+
+    if (req.userId !== place.creator.toString()) {
+      const error = new Error("You are not allowed to delete this place.");
+      error.code = 401;
+      throw error;
+    }
+
+    await Place.findByIdAndDelete(placeId);
+    user.places.pull(placeId);
+    await user.save();
+
+    res.status(200).json({ message: "Deleted place successfully." });
   } catch (error) {
     return next(error);
   }

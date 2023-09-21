@@ -20,4 +20,13 @@ router.post(
   placesControllers.createPlace
 );
 
+router.patch(
+  "/:placeId",
+  auth,
+  [check("title").notEmpty(), check("description").notEmpty()],
+  placesControllers.updatePlace
+);
+
+router.delete("/delete-place/:placeId", auth, placesControllers.deletePlace);
+
 module.exports = router;
