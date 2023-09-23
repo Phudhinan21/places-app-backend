@@ -14,7 +14,7 @@ exports.getPlaceById = async (req, res, next) => {
       throw error;
     }
 
-    res.status(200).json({ place: place });
+    res.status(200).json({ place: place.toObject({ getters: true }) });
   } catch (error) {
     return next(error);
   }
@@ -34,7 +34,11 @@ exports.getPlaceByUserId = async (req, res, next) => {
 
     const places = await Place.find({ creator: userId });
 
-    res.status(200).json({ places: places });
+    res.status(200).json({
+      places: places.map((place) => {
+        return place.toObject({ getters: true });
+      }),
+    });
   } catch (error) {
     return next(error);
   }
@@ -55,7 +59,7 @@ exports.createPlace = async (req, res, next) => {
   const { title, description, address } = req.body;
 
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.userId).select("-password");
 
     if (!user) {
       const error = new Error("There is no user.");
@@ -76,8 +80,8 @@ exports.createPlace = async (req, res, next) => {
 
     res.status(201).json({
       message: "Created place successfully",
-      place: newPlace,
-      user: user,
+      place: newPlace.toObject({ getters: true }),
+      user: user.toObject({ getters: true }),
     });
   } catch (error) {
     return next(error);
@@ -130,7 +134,10 @@ exports.updatePlace = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "Updated place successfully", place: place });
+      .json({
+        message: "Updated place successfully",
+        place: place.toObject({ getters: true }),
+      });
   } catch (error) {
     return next(error);
   }

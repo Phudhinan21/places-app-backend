@@ -8,7 +8,11 @@ exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().select("-password");
 
-    res.status(200).json({ users: users });
+    res.status(200).json({
+      users: users.map((user) => {
+        return user.toObject({ getters: true });
+      }),
+    });
   } catch (err) {
     const error = new Error("Fetched users is failed, please try again.");
     err.code = 500;
@@ -111,13 +115,11 @@ exports.login = async (req, res, next) => {
       }
     );
 
-    res
-      .status(200)
-      .json({
-        message: "Login successfully",
-        token: token,
-        user: { userId: user.id },
-      });
+    res.status(200).json({
+      message: "Login successfully",
+      token: token,
+      user: { userId: user.id },
+    });
   } catch (error) {
     next(error);
   }
