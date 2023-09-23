@@ -26,9 +26,10 @@ exports.getUser = async (req, res, next) => {
       throw error;
     }
 
-    res
-      .status(200)
-      .json({ message: "Authenticated successfully.", user: user });
+    res.status(200).json({
+      message: "Authenticated successfully.",
+      user: { userId: user._id },
+    });
   } catch (error) {
     return next(error);
   }
@@ -72,7 +73,11 @@ exports.signup = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ message: "Signup successfully", token: token });
+    res.status(200).json({
+      message: "Signup successfully",
+      token: token,
+      user: { userId: newUser.id },
+    });
   } catch (error) {
     return next(error);
   }
@@ -106,7 +111,13 @@ exports.login = async (req, res, next) => {
       }
     );
 
-    res.status(200).json({ message: "Login successfully", token: token });
+    res
+      .status(200)
+      .json({
+        message: "Login successfully",
+        token: token,
+        user: { userId: user.id },
+      });
   } catch (error) {
     next(error);
   }
